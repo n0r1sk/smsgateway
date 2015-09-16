@@ -1,0 +1,54 @@
+@CHARSET "UTF-8";
+
+body{
+	font-family: arial;
+}
+
+table.tablesorter {
+        font-size: 13px !important;
+}
+
+#logo {
+    text-align: center;
+    margin-top: 20px;
+}
+
+input {
+    border: 1px solid;
+}
+
+table.logintable {
+    align-self: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#loginform {
+    text-align: center;
+    margin-top: 100px;
+}
+
+#watchdogstatus, #routerstatus {
+    color: #fff;
+    min-width: 101px;
+    max-width: 100px;
+    text-align: center;
+}
+
+.btn {
+    background: #007dc1 linear-gradient(to bottom, #007dc1 5%, #0061a7 100%) repeat scroll 0 0;
+    border: 1px solid #124d77;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 0 #54a3f7 inset;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: Arial;
+    font-size: 13px;
+    padding: 6px 24px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #154682;
+}
+.btn:hover {
+    background: #0061a7 linear-gradient(to bottom, #0061a7 5%, #007dc1 100%) repeat scroll 0 0;
+}

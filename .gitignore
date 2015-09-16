@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+*/*.swp
+*.swp
+logs/*.log
+*.sqlite
+.ropeproject
