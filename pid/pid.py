@@ -98,6 +98,9 @@ class PidWsClient(WebSocketClient):
             if diff.seconds > 300:
                 if self.check_primpid() == "reconnect":
                     # close Websocket to reconnect!
+                    # fixes #25 wait a bit to let pis fetch the smsstatus first
+                    time.sleep(0.55)
+
                     closingreason = "Primary PID is back! Reinit now!"
                     pidglobals.closingcode = 4001
                     self.close(code=4001, reason=closingreason)
@@ -244,12 +247,11 @@ class Pid(object):
 
         modemcfg = cfg.getvalue('modemlist', '[{}]', 'pid')
 
-
         # convert json to list of dictionary entries
         modemlist = json.loads(modemcfg)
         # check if modemcfg is set
-        if not 'modemid' in modemlist[0]:
-        #if len(modemlist) == 0:
+        if 'modemid' not in modemlist[0]:
+            # if len(modemlist) == 0:
             cfg.errorandexit("modemlist - not set!!!")
 
         # connect to USBModems and persist in pidglobals
