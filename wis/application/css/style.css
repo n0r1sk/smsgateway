@@ -23,6 +23,11 @@ table.logintable {
     margin-right: auto;
 }
 
+#routingtablewisid {
+    background: #ccb;
+    font-size: .7em;
+}
+
 #loginform {
     text-align: center;
     margin-top: 100px;

@@ -32,3 +32,5 @@ sslenabled = None
 sslcertificate = None
 sslprivatekey = None
 sslcertificatechain = None
+
+version = None

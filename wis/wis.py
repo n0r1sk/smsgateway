@@ -18,6 +18,7 @@ import json
 from os import path
 import sys
 sys.path.insert(0, "..")
+import re
 
 from common import error
 from common.config import SmsConfig
@@ -393,6 +394,15 @@ class Wisserver(object):
         abspath = path.abspath(path.join(path.dirname(__file__), path.pardir))
         configfile = abspath + '/conf/smsgw.conf'
         cfg = SmsConfig(configfile)
+
+        readme = open(abspath + '/README.md', 'r')
+        readmecontent = readme.read()
+        version = re.compile(r"(?<=## Version)(.*v.\..*)", re.S).findall(readmecontent)
+        if version:
+            wisglobals.version = version[0].strip('\n')
+
+        smsgwglobals.wislogger.debug("WIS: Version: " + str(wisglobals.version))
+
         wisglobals.wisid = cfg.getvalue('wisid', 'nowisid', 'wis')
         wisglobals.wisipaddress = cfg.getvalue('ipaddress', '127.0.0.1', 'wis')
         wisglobals.wisport = cfg.getvalue('port', '7777', 'wis')

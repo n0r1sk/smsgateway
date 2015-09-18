@@ -163,20 +163,22 @@ class ViewMain(Htmlpage):
          </script>''')
         str_list.append('''
         <table>
-            <tbody><tr>
-            <td>
-            <button class="btn" type="button" onclick="getRouting()">Refresh Routing</button>
-            </td>
-            <td>
-                Router status:
-            </td>
-            <td id="routerstatus"></td>
-            <td>
-                Watchdog status:
-            </td>
-            <td id="watchdogstatus"></td>
-            </tr>
-            </tbody>
+                    <tbody>
+                    <tr>
+                        <td rowspan="2"><img src="images/n0r1sk-smsgateway-logo-small.png"></td>
+                        <td id="routingtablewisid">WisID: ''' + wisglobals.wisid + '''</td>
+                        <td></td>
+                        <td>Router status:</td>
+                        <td id="routerstatus"></td>
+                        <td>Watchdog status:</td>
+                        <td id="watchdogstatus"></td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn" type="button" onclick="getRouting()">Refresh Routing</button></td>
+                        <td></td>
+                        <td></td>
+                        </tr>
+                    </tbody>
         </table>
         ''')
         str_list.append('<div class="routing">')
@@ -185,7 +187,7 @@ class ViewMain(Htmlpage):
         str_list.append('<form id="getsms" action="ajax/getsms">\n')
         str_list.append('Date:<input type="text" name="date">\n')
         str_list.append('<button class="btn" type="button"' +
-                        ' onclick="getSms()">Read from local</button>&nbsp;')
+                        ' onclick="getSms()">Read from ' + wisglobals.wisid + '</button>&nbsp;')
         str_list.append('<button class="btn" type="button"' +
                         ' onclick="getAllSms()">Read from routing</button>')
         str_list.append('</form>')
