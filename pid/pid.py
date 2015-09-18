@@ -99,7 +99,7 @@ class PidWsClient(WebSocketClient):
                 if self.check_primpid() == "reconnect":
                     # close Websocket to reconnect!
                     # fixes #25 wait a bit to let pis fetch the smsstatus first
-                    time.sleep(0.55)
+                    time.sleep(1)
 
                     closingreason = "Primary PID is back! Reinit now!"
                     pidglobals.closingcode = 4001
