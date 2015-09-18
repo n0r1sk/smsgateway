@@ -105,7 +105,7 @@ class Smstransfer(object):
                           self.smsdict["xforwardedfor"],
                           self.smsdict["smsintime"],
                           self.smsdict["status"],
-                          self.smsdict["statustime"])
+                          self.smsdict["statustime"],
                           self.smsdict["smsid"])
         except error.DatabaseError as e:
             smsgwglobals.wislogger.debug(e.message)
