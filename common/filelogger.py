@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import inspect
 
 """
 Class that provides the minimal interface for stdout, stderr
@@ -30,6 +31,9 @@ class FileLogger:
         self.logger = logger
 
     def write(self, data):
+        curframe = inspect.currentframe()
+        calframe = inspect.getouterframes(curframe, 2)
+        self.logger.debug("STDIO: Called from: " + calframe[1][3])
         for line in data.splitlines():
             self.logger.debug("STDIO: " + line)
 

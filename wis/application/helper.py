@@ -262,6 +262,9 @@ class Helper(object):
                 except socket.timeout as e:
                     smsgwglobals.wislogger.debug(e)
                     smsgwglobals.wislogger.debug("HELPER: receiverouting socket connection timeout")
+                except socket.error as e:
+                    smsgwglobals.wislogger.debug(e)
+                    smsgwglobals.wislogger.debug("HELPER: receiverouting socket connection error")
 
     @staticmethod
     def requestrouting(peers=None, initial=False):

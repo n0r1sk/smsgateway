@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import configparser
-import inspect
 import ast
 import sys
 sys.path.insert(0, "..")
@@ -43,8 +42,6 @@ class SmsConfig(object):
         # check if config file is valid
         sectionsfound = self.getsections()
         sectionsneeded = ['db', 'pis', 'pid', 'wis']
-        curframe = inspect.currentframe()
-        calframe = inspect.getouterframes(curframe, 2)
         if len(set(sectionsfound) & set(sectionsneeded)) != 4:
             self.errorandexit("Missing or wrong sections in config file!")
 

@@ -124,26 +124,6 @@ class Database(object):
                  )
         self.__cur.execute(query)
 
-    # TODO delete
-    """
-    # Create table and index for table routing
-    def create_table_routing(self):
-        smsgwglobals.dblogger.info("SQLite: Create table 'routing'")
-        query = ("CREATE TABLE IF NOT EXISTS routing (" +
-                 "wisid TEXT, " +
-                 "modemid TEXT, " +
-                 "regex TEXT, " +
-                 "lbcount INTEGER, " +
-                 "lbfactor INTEGER, " +
-                 "wisurl TEXT, " +
-                 "pisurl TEXT, " +
-                 "modemname TEXT, " +
-                 "obsolete INTEGER, " +
-                 "changed TIMESTAMP, " +
-                 "PRIMARY KEY (wisid, modemid))")
-        self.__cur.execute(query)
-    """
-
     # Insert or replaces a users data
     def write_users(self, user, password, salt, changed=None):
         """Insert or replace a users entry
@@ -180,7 +160,7 @@ class Database(object):
     def insert_sms(self, modemid='00431234', targetnr='+431234',
                    content='♠♣♥♦Test', priority=1, appid='demo',
                    sourceip='127.0.0.1', xforwardedfor='172.0.0.1',
-                   smsintime=None, status=0, statustime=None):
+                   smsintime=None, status=0, statustime=None, smsid=None):
         """Insert a fresh SMS out of WIS
         Attributes: modemid ... string-countryexitcode+number (0043664123..)
         targetnr ... string-no country exit code (+436761234..)
@@ -193,7 +173,10 @@ class Database(object):
         status ... int-0 new, ???
         statustime ... datetime.utcnow()
         """
-        smsid = str(uuid.uuid1())
+        # check if smsid is empty string or None
+        if smsid is None or (not smsid):
+            smsid = str(uuid.uuid1())
+
         now = datetime.utcnow()
         if smsintime is None:
             smsintime = now
@@ -273,130 +256,7 @@ class Database(object):
                                                " failed! [EXCEPTION]:%s", e)
                 raise error.DatabaseError("Unable to UPDATE sms! ", e)
 
-    # TODO delete
-    """
-    # Insert or replaces a list of routing entries
-    def write_routing(self, wisid, modemid, regex, lbcount, lbfactor, wisurl,
-                      pisurl, modemname, obsolete, changed=None):
-    """
-    """Insert or replace a routing entry
-        Attributes: wisid ... text-1st of primary key
-        modemid ... text-serving modem number-2nd of primary key
-        regex ... text-regex to match numbers for modem
-        lbcount ... int-number of sms delivered
-        lbfactor ... int-factor if different contingets
-        wisurl ... text-url of wis
-        obsolete ... route got flag for deletion
-        modemname ... text-longtext of modem
-        changed ... datetime.utcnow-when changed
-    """
-    """
-        query = ("INSERT OR REPLACE INTO routing " +
-                 "(wisid, modemid, regex, lbcount, lbfactor, wisurl, " +
-                 "pisurl, obsolete, modemname, changed) " +
-                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ")
-        # set changed timestamp to utcnow if not set
-        if changed is None:
-            changed = datetime.utcnow()
-
-        try:
-            smsgwglobals.dblogger.debug("SQLite: Write into routing" +
-                                        " :wisid: " + wisid +
-                                        " :modemid: " + modemid +
-                                        " :regex: " + regex +
-                                        " :lbcount: " + str(lbcount) +
-                                        " :lbfactor: " + str(lbfactor) +
-                                        " :wisurl: " + wisurl +
-                                        " :pisurl: " + pisurl +
-                                        " :obsolete: " + str(obsolete) +
-                                        " :modemname: " + modemname +
-                                        " :changed: " + str(changed)
-                                        )
-            self.__cur.execute(query, (wisid, modemid, regex, lbcount,
-                                       lbfactor, wisurl, pisurl, obsolete,
-                                       modemname, changed))
-            self.__con.commit()
-            smsgwglobals.dblogger.debug("SQLite: Insert done!")
-
-        except Exception as e:
-            smsgwglobals.dblogger.critical("SQLite: " + query +
-                                           " failed! [EXCEPTION]:%s", e)
-            raise error.DatabaseError("Unable to INSERT routing entry! ", e)
-
-    # Merge routelist with routelist out of db
-    # TODO Wie wollen wir Einträge löschen -> eigener URL und dann broadcast
-    # to all WIS in order to update dbs. Alternative ???
-    def merge_routing(self, routelist=[]):
-    """
-    """ Merges route entries from database with those given in routelist
-        older values are replaced and new ones are inserted on both sites
-        Attributes: routelist ... list of routing entiies  in dictionary
-        structure (see read_routing)
-        Return: new routelist ... list of merged routing entries out of DB
-    """
-    """
-        # read routing entries out of db
-        dbroutelist = self.read_routing()
-        smsgwglobals.dblogger.debug("SQLite: Will merge " +
-                                    str(len(routelist)) +
-                                    " given route entires with " +
-                                    str(len(dbroutelist)) +
-                                    " entries from db.")
-
-        # iterate routelist and update form db if entries are newer
-        mergedroutelist = []
-        for route in routelist:
-            smsgwglobals.dblogger.debug("SQLite: Now on route: " +
-                                        route['wisid'] + ":" + route['modemid'])
-
-            for dbroute in dbroutelist:
-                if route['wisid'] == dbroute['wisid'] and \
-                        route['modemid'] == dbroute['modemid'] and \
-                        route['changed'] < dbroute['changed']:
-                    smsgwglobals.dblogger.debug("SQLite: Route " +
-                                                dbroute['wisid'] + ":" +
-                                                dbroute['modemid'] +
-                                                " in database is newer!")
-                    route = dbroute
-
-            # add entry to merged list
-            mergedroutelist.append(route)
-        """
-    """
-        # insert/replace merged list to db
-        # for route in mergedroutelist:
-        for route in routelist:
-            if route['obsolete'] > 0:
-                changed = route['changed']
-                obsolete = route['obsolete'] + 1
-            else:
-                changed = datetime.utcnow()
-                # dont overwrite deletion mark in DB
-                if route['obsolete'] == 0:
-                    try:
-                        dbroute = self.read_routing(route['wisid'],
-                                                    route['modemid'])
-                    except Exception:
-                        obsolete = 0
-                        pass
-                    obsolete = dbroute['obsolete']
-                else:
-                    obsolete = route['obsolete']
-
-            self.write_routing(route['wisid'], route['modemid'],
-                               route['regex'], route['lbcount'],
-                               route['lbfactor'], route['wisurl'],
-                               route['pisurl'], route['modemname'],
-                               obsolete, changed)
-            # route['obsolete'], route['changed'])
-
-        # return full route list out of db
-        return self.read_routing()
-    """
-
     # Merge userlist with userlist out of db
-    # TODO Wie wollen wir Einträge löschen -> eigener URL und dann broadcast
-    # to all WIS in order to update dbs. Alternative ???
     def merge_users(self, userlist=[]):
         """ Merges user entries from database with those given in userlist
         older values are replaced and new ones are inserted on both sites
@@ -450,36 +310,6 @@ class Database(object):
             smsgwglobals.dblogger.critical("SQLite: " + query +
                                            " failed! [EXCEPTION]:%s", e)
             raise error.DatabaseError("Unable to DELETE from users! ", e)
-
-    # TODO delete
-    """
-    # Delete routing entry by wisid
-    def delete_routing(self, wisid, modemid=None):
-        smsgwglobals.dblogger.debug("SQlite: Deleting" +
-                                    " routing entries for wisid: " +
-                                    wisid + " modemid: " + str(modemid))
-        query = ("DELETE FROM routing " +
-                 "WHERE wisid = ?")
-        try:
-            if modemid is None:
-                result = self.__cur.execute(query, [wisid])
-            else:
-                # modemid is set
-                query = query + " AND modemid = ?"
-                result = self.__cur.execute(query, (wisid, modemid))
-
-            count = result.rowcount
-            self.__con.commit()
-            smsgwglobals.dblogger.debug("SQLite: " + str(count) +
-                                        " routing entries for" +
-                                        " wisid: " + wisid +
-                                        " modemid: " + str(modemid) +
-                                        " deleted!")
-        except Exception as e:
-            smsgwglobals.dblogger.critical("SQLite: " + query +
-                                           " failed! [EXCEPTION]:%s", e)
-            raise error.DatabaseError("Unable to DELETE from routing! ", e)
-    """
 
     # Delete UNITTEST sms
     def delete_unittest_sms(self, modemid):
@@ -558,42 +388,6 @@ class Database(object):
             smsgwglobals.dblogger.debug("SQLite: " + str(len(user)) +
                                         " user selected.")
             return user
-
-    # TODO delete
-    """
-    # Read routing entries
-    def read_routing(self, wisid=None, modemid=None):
-        smsgwglobals.dblogger.debug("SQLite: Read routing entries")
-        query = ("SELECT " +
-                 "wisid, " +
-                 "modemid, " +
-                 "regex, " +
-                 "lbcount, " +
-                 "lbfactor, " +
-                 "wisurl, " +
-                 "pisurl, " +
-                 "modemname, " +
-                 "obsolete, " +
-                 "changed " +
-                 "FROM routing")
-        try:
-            if wisid is None and modemid is None:
-                result = self.__cur.execute(query)
-            else:
-                query = query + " WHERE wisid = ? AND modemid = ?"
-                result = self.__cur.execute(query, [wisid, modemid])
-
-        except Exception as e:
-            smsgwglobals.dblogger.critical("SQLite: " + query +
-                                           " failed! [EXCEPTION]:%s", e)
-            raise error.DatabaseError("Unable to SELECT FROM routing! ", e)
-        else:
-            # convert rows to dict
-            routes = [dict(row) for row in result]
-            smsgwglobals.dblogger.debug("SQLite: " + str(len(routes)) +
-                                        " routing entries selected.")
-            return routes
-    """
 
     # Read sms
     def read_sms_date(self, date=None):
