@@ -82,6 +82,9 @@ class ViewMain(Htmlpage):
          function getAllSms(){
                         var datum = $("#getsms input[name=date]").val();
                         $('div.sms').load('ajax/getsms', {all : "true", date: datum}, function(){
+            if ( $( "#sessiontimeout" ).length ) {
+            location.reload();
+            }
          $("#smsTable").tablesorter(
                         {headers: { 4: { sorter:'customDate' }, 8: { sorter:'customDate' }},
                         sortList: [[4,1], [8,1]],
@@ -93,6 +96,9 @@ class ViewMain(Htmlpage):
          function getSms(){
                         var datum = $("#getsms input[name=date]").val();
                         $('div.sms').load('ajax/getsms', {all : "false", date: datum}, function(){
+            if ( $( "#sessiontimeout" ).length ) {
+            location.reload();
+            }
          $("#smsTable").tablesorter(
              {headers: { 4: { sorter:'customDate' }, 8: { sorter:'customDate' }},
              sortList: [[4,1], [8,1]],
@@ -105,6 +111,9 @@ class ViewMain(Htmlpage):
          function getStatus(){
 
             $.post( "ajax/status", function( data ) {
+            if ( $( "#sessiontimeout" ).length ) {
+            location.reload();
+            }
 
             var status = JSON.parse(data);
 
@@ -126,6 +135,9 @@ class ViewMain(Htmlpage):
 
          function getRouting() {
          $('div.routing').load('ajax/getrouting', function(){
+            if ( $( "#sessiontimeout" ).length ) {
+            location.reload();
+            }
             $("#routingTable").tablesorter(
                 {headers: { 0: { sorter:'customDate' }},
                 sortList: [[0,1], [9,1]],
@@ -166,7 +178,7 @@ class ViewMain(Htmlpage):
                     <tbody>
                     <tr>
                         <td rowspan="2"><img src="images/n0r1sk-smsgateway-logo-small.png"></td>
-                        <td id="routingtablewisid">WisID: ''' + wisglobals.wisid + '''</td>
+                        <td id="routingtablewisid">WisID: ''' + wisglobals.wisid + '''<br>Version: ''' + wisglobals.version + '''</td>
                         <td></td>
                         <td>Router status:</td>
                         <td id="routerstatus"></td>
@@ -367,42 +379,52 @@ class Login(Htmlpage):
         self.setBody()
 
     def setBody(self):
-        str_list = """<body>
-<div id="pageBody">
-  <div id="logo">
-    <img src="images/application_logo.png">
-  </div>
-  <div id="loginform">
-    <form method="post" action="checkpassword">
-  <table class="logintable">
-    <tbody>
+        str_list = """
+<body>
+<table>
+   <tbody>
       <tr>
-      <td class="label">
-        Username:
-      </td>
-      <td class="form">
-        <input name="username" type="text">
-      </td>
-    </tr>
-    <tr>
-      <td class="label">
-        Password:
-      </td>
-      <td class="form">
-        <input name="password" type="password">
-      </td>
-    </tr>
-        <tr>
-      <td class="label">
-        </td>
-      <td class="form">
-        <input value="Login" type="submit">
-      </td>
-    </tr>
-  </tbody>
-      </table>
-  </form></div>
-  </div>
+         <td>
+            <div id="logo">
+               <img src="images/n0r1sk-smsgateway-logo-small.png">
+            </div>
+         </td>
+         <td>
+            <div id="loginform">
+               <form method="post" action="checkpassword">
+                  <table class="logintable">
+                     <tbody>
+                        <tr>
+                           <td class="label">
+                              Username:
+                           </td>
+                           <td class="form">
+                              <input name="username" type="text">
+                           </td>
+                        </tr>
+                        <tr>
+                           <td class="label">
+                              Password:
+                           </td>
+                           <td class="form">
+                              <input name="password" type="password">
+                           </td>
+                        </tr>
+                        <tr>
+                           <td class="label">
+                           </td>
+                           <td class="form">
+                              <input value="Login" type="submit">
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </form>
+            </div>
+         </td>
+      </tr>
+   </tbody>
+</table>
 </body>
 """
         Htmlpage.body = str_list

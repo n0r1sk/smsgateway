@@ -168,7 +168,8 @@ class Root(object):
     @cherrypy.tools.allow(methods=['POST', 'GET'])
     def ajax(self, arg, **params):
         if 'logon' not in cherrypy.session:
-            raise cherrypy.HTTPRedirect("/smsgateway")
+            # raise cherrypy.HTTPRedirect("/smsgateway")
+            return '<div id="sessiontimeout"></div>'
 
         smsgwglobals.wislogger.debug("AJAX: request with %s and %s ", str(arg), str(params))
 

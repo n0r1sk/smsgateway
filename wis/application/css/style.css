@@ -10,7 +10,6 @@ table.tablesorter {
 
 #logo {
     text-align: center;
-    margin-top: 20px;
 }
 
 input {
@@ -24,13 +23,12 @@ table.logintable {
 }
 
 #routingtablewisid {
-    background: #ccb;
+    background: #d5d5d5;
     font-size: .7em;
 }
 
 #loginform {
     text-align: center;
-    margin-top: 100px;
 }
 
 #watchdogstatus, #routerstatus {
