@@ -42,6 +42,8 @@ class Htmlpage(object):
                         'rel="stylesheet" type="text/css" />')
         str_line.append('<script type="text/javascript"' +
                         ' src="ts/js/jquery.tablesorter.widgets.min.js"></script>')
+        str_line.append('<script type="text/javascript"' +
+                        ' src="js/main.js"></script>')
 
         str_line.append('</head>')
         self.header = ''.join(str_line)

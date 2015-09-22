@@ -33,4 +33,7 @@ sslcertificate = None
 sslprivatekey = None
 sslcertificatechain = None
 
+validusernameregex = None
+validusernamelength = None
+
 version = None

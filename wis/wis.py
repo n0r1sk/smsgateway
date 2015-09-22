@@ -121,6 +121,24 @@ class Root(object):
         username = cherrypy.request.params.get('username').lower()
         password = cherrypy.request.params.get('password')
 
+        # check if password is empty
+        if not password:
+            smsgwglobals.wislogger.debug("FRONT: No password on login")
+            raise cherrypy.HTTPRedirect("/smsgateway")
+
+        # check if username is valid
+        if not username:
+            smsgwglobals.wislogger.debug("FRONT: No username on login")
+            raise cherrypy.HTTPRedirect("/smsgateway")
+
+        if len(username) > wisglobals.validusernamelength:
+            smsgwglobals.wislogger.debug("FRONT: Username to long on login")
+            raise cherrypy.HTTPRedirect("/smsgateway")
+
+        if (re.compile(wisglobals.validusernameregex).findall(username)):
+            smsgwglobals.wislogger.debug("FRONT: Username is not valid login")
+            raise cherrypy.HTTPRedirect("/smsgateway")
+
         if 'root' in username:
             smsgwglobals.wislogger.debug("FRONT: ROOT Login " + username)
             try:
@@ -150,6 +168,7 @@ class Root(object):
                 c = Connection(s, user=userdn, password=password)
 
                 if c.bind():
+                    smsgwglobals.wislogger.debug("FRONT: Ldap login successful " + username)
                     cherrypy.session['logon'] = True
                     raise cherrypy.HTTPRedirect("/smsgateway/main")
                 else:
@@ -408,6 +427,9 @@ class Wisserver(object):
         wisglobals.wisipaddress = cfg.getvalue('ipaddress', '127.0.0.1', 'wis')
         wisglobals.wisport = cfg.getvalue('port', '7777', 'wis')
         wisglobals.cleanupseconds = cfg.getvalue('cleanupseconds', '86400', 'wis')
+
+        wisglobals.validusernameregex = cfg.getvalue('validusernameregex', '([^a-zA-Z0-9])', 'wis')
+        wisglobals.validusernamelength = cfg.getvalue('validusernamelength', 30, 'wis')
 
         wisglobals.ldapserver = cfg.getvalue('ldapserver', None, 'wis')
         wisglobals.ldapbasedn = cfg.getvalue('ldapbasedn', None, 'wis')
