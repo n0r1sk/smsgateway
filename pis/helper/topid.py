@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/susr/bin/python
 # Copyright 2015 Neuhold Markus and Kleinsasser Mario
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -156,8 +156,11 @@ class PID(object):
 
     @staticmethod
     def getclientaddress(modemid):
+        print(pisglobals.knownpids)
         smsgwglobals.pislogger.debug("PID: Query address for modemid: " +
                                      modemid)
+        smsgwglobals.pislogger.debug("PID: getclientaddress has kownpids = " +
+                                     str(pisglobals.knownpids))
         for address in pisglobals.knownpids:
             for modem in pisglobals.knownpids[address]['modemlist']:
                 if modem['modemid'] == modemid:

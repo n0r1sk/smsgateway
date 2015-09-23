@@ -33,9 +33,9 @@ class FileLogger:
     def write(self, data):
         curframe = inspect.currentframe()
         calframe = inspect.getouterframes(curframe, 2)
-        self.logger.debug("STDIO: Called from: " + calframe[1][3])
+        self.logger.error("STDIO: Called from: " + calframe[1][3])
         for line in data.splitlines():
-            self.logger.debug("STDIO: " + line)
+            self.logger.error("STDIO: " + line)
 
     def flush(self):
         pass
