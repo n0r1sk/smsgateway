@@ -156,7 +156,6 @@ class PID(object):
 
     @staticmethod
     def getclientaddress(modemid):
-        print(pisglobals.knownpids)
         smsgwglobals.pislogger.debug("PID: Query address for modemid: " +
                                      modemid)
         smsgwglobals.pislogger.debug("PID: getclientaddress has kownpids = " +
