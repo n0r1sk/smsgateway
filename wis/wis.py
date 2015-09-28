@@ -369,11 +369,15 @@ class Root(object):
     @cherrypy.tools.allow(methods=['GET', 'POST'])
     def sendsms(self, **params):
 
+        priority = 1
+        if 'priority' in cherrypy.request.params:
+            priority = int(cherrypy.request.params.get('priority'))
+
         # this is used for parameter extraction
         # Create sms data object
         sms = Smstransfer(content=cherrypy.request.params.get('content'),
                           targetnr=cherrypy.request.params.get('mobile'),
-                          priority=int(cherrypy.request.params.get('priority')),
+                          priority=priority,
                           appid=cherrypy.request.params.get('appid'),
                           sourceip=cherrypy.request.headers.get('Remote-Addr'),
                           xforwardedfor=cherrypy.request.headers.get(
