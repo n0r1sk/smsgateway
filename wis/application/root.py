@@ -258,7 +258,7 @@ class Login(Htmlpage):
                               Username:
                            </td>
                            <td class="form">
-                              <input name="username" type="text">
+                              <input name="username" type="text" autofocus>
                            </td>
                         </tr>
                         <tr>
