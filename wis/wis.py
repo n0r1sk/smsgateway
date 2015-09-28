@@ -369,6 +369,9 @@ class Root(object):
     @cherrypy.tools.allow(methods=['GET', 'POST'])
     def sendsms(self, **params):
 
+        # all parameters to lower case
+        cherrypy.request.params = dict([(x[0].lower(), x[1]) for x in cherrypy.request.params.items()])
+
         priority = 1
         if 'priority' in cherrypy.request.params:
             priority = int(cherrypy.request.params.get('priority'))
