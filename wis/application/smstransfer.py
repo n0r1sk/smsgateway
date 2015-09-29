@@ -116,7 +116,7 @@ class Smstransfer(object):
             smsen = []
             smsen.append(self.smsdict)
             smsgwglobals.wislogger.debug("WATCHDOG: " +
-                                         "UPDATING")
+                                         "UPDATING " + str(self.smsdict["smsid"]) + " " + str(self.smsdict["status"]))
             db.update_sms(smsen)
         except error.DatabaseError as e:
             smsgwglobals.wislogger.debug(e.message)
