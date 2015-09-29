@@ -203,7 +203,7 @@ class Watchdog(threading.Thread):
                     smsgwglobals.wislogger.debug("WATCHDOG: Sending to PIS %s", str(sms))
                     # only continue if route contains data
                     if len(route) > 0:
-                        self.send(sms, route)
+                        self.send(smstrans, route)
 
             smsen = db.read_sms(status=0)
             smsen = smsen + db.read_sms(status=1)
