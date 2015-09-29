@@ -23,7 +23,7 @@ from application import wisglobals
 from application import smstransfer
 from application.helper import Helper
 import urllib.request
-import json
+# import json
 import socket
 
 
@@ -37,10 +37,12 @@ class Watchdog(threading.Thread):
         self.threadID = threadID
         self.name = name
 
-    def send(self, sms, route):
+    def send(self, smstrans, route):
         # encode to json
-        jdata = json.dumps(sms)
+        jdata = smstrans.getjson()
         data = GlobalHelper.encodeAES(jdata)
+        # jdata = json.dumps(sms)
+        # data = GlobalHelper.encodeAES(jdata)
 
         request = \
             urllib.request.Request(
@@ -50,12 +52,12 @@ class Watchdog(threading.Thread):
         request.add_header("Content-Type",
                            "application/json;charset=utf-8")
 
-        smstrans = smstransfer.Smstransfer(**sms)
+        # smstrans = smstransfer.Smstransfer(**sms)
 
         try:
             smsgwglobals.wislogger.debug("WATCHDOG: " +
                                          "Sending VIA " +
-                                         sms["modemid"] +
+                                         smstrans["modemid"] +
                                          route[0]["pisurl"] +
                                          "/sendsms")
             f = urllib.request.urlopen(request, data, timeout=20)
@@ -198,7 +200,7 @@ class Watchdog(threading.Thread):
                     # this may lead to an error, fixme
                     route[:] = [d for d in route if d['obsolete'] < 13]
                     smsgwglobals.wislogger.debug("WATCHDOG: process with route %s ", str(route))
-                    smsgwglobals.wislogger.debug("WATCHDOG: Sending to PIS")
+                    smsgwglobals.wislogger.debug("WATCHDOG: Sending to PIS %s", str(sms))
                     # only continue if route contains data
                     if len(route) > 0:
                         self.send(sms, route)
