@@ -8,4 +8,4 @@ It is scalable in number of modems, routes SMS by targetnumber and runs on a sin
 [![SMS Gateway screencast](https://raw.githubusercontent.com/wiki/n0r1sk/smsgateway/images/smsgw-youtube.png)](http://www.n0r1sk.com/smsgateway-youtube)
 
 ## Version
-v1.2
+v1.3
