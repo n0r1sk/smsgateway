@@ -21,7 +21,7 @@ sys.path.insert(0, "..")
 from common import error
 
 
-# Default: Sections are case sensitive but keys are not
+# Default: Sections are case sensitive but keys are not.
 # See also: https://docs.python.org/3/library/configparser.html
 class SmsConfig(object):
     """Base class for reading the configuration file
