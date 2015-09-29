@@ -19,6 +19,7 @@ from os import path
 import sys
 sys.path.insert(0, "..")
 import re
+import uuid
 
 from common import error
 from common.config import SmsConfig
@@ -377,14 +378,15 @@ class Root(object):
             priority = int(cherrypy.request.params.get('priority'))
 
         # this is used for parameter extraction
-        # Create sms data object
+        # Create sms data object and make sure that it has a smsid
         sms = Smstransfer(content=cherrypy.request.params.get('content'),
                           targetnr=cherrypy.request.params.get('mobile'),
                           priority=priority,
                           appid=cherrypy.request.params.get('appid'),
                           sourceip=cherrypy.request.headers.get('Remote-Addr'),
                           xforwardedfor=cherrypy.request.headers.get(
-                              'X-Forwarded-For'))
+                              'X-Forwarded-For'),
+                          smsid=str(uuid.uuid1()))
 
         # check if parameters are given
         resp = XMLResponse()
@@ -398,7 +400,7 @@ class Root(object):
             self.triggerwatchdog()
             return resp.errorxml("0001")
 
-        smsgwglobals.wislogger.debug(sms.getjson())
+        smsgwglobals.wislogger.debug("WIS: sendsms iterface " + str(sms.getjson()))
 
         # process sms to insert it into database
         try:

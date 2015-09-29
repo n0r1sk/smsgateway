@@ -174,7 +174,9 @@ class Database(object):
         statustime ... datetime.utcnow()
         """
         # check if smsid is empty string or None
-        if smsid is None or (not smsid):
+        if smsid is None:
+            smsid = str(uuid.uuid1())
+        if not smsid:
             smsid = str(uuid.uuid1())
 
         now = datetime.utcnow()
