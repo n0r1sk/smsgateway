@@ -59,7 +59,7 @@ class Watchdog(threading.Thread):
                                          route[0]["pisurl"] +
                                          "/sendsms")
             f = urllib.request.urlopen(request, data, timeout=20)
-            smsgwglobals.wislogger.debug("WATCHDOG: SMS send to PIS returncode:" + f.getcode())
+            smsgwglobals.wislogger.debug("WATCHDOG: SMS send to PIS returncode:" + str(f.getcode()))
             # if all is OK set the sms status to SENT
             smstrans.smsdict["statustime"] = datetime.utcnow()
             if f.getcode() == 200:
@@ -114,7 +114,7 @@ class Watchdog(threading.Thread):
                                          route[0]["wisurl"] +
                                          "/smsgateway/api/deligate")
             f = urllib.request.urlopen(request, data, timeout=20)
-            smsgwglobals.wislogger.debug("WATCHDOG: SMS deligate to PIS returncode:" + f.getcode())
+            smsgwglobals.wislogger.debug("WATCHDOG: SMS deligate to PIS returncode:" + str(f.getcode()))
             # if all is OK set the sms status to SENT
             smstrans.smsdict["statustime"] = datetime.utcnow()
             if f.getcode() == 200:
