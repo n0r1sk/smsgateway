@@ -39,10 +39,8 @@ class Watchdog(threading.Thread):
 
     def send(self, smstrans, route):
         # encode to json
-        jdata = smstrans.getjson()
+        jdata = json.dumps(smstrans.smsdict)
         data = GlobalHelper.encodeAES(jdata)
-        # jdata = json.dumps(sms)
-        # data = GlobalHelper.encodeAES(jdata)
 
         request = \
             urllib.request.Request(
@@ -57,7 +55,7 @@ class Watchdog(threading.Thread):
         try:
             smsgwglobals.wislogger.debug("WATCHDOG: " +
                                          "Sending VIA " +
-                                         smstrans["modemid"] +
+                                         smstrans.smsdict["modemid"] +
                                          route[0]["pisurl"] +
                                          "/sendsms")
             f = urllib.request.urlopen(request, data, timeout=20)
