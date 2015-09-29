@@ -65,20 +65,20 @@ class Watchdog(threading.Thread):
             if f.getcode() == 200:
                 if smstrans.smsdict["status"] == 0:
                     smstrans.smsdict["status"] = 4
-                    smsgwglobals.wislogger.debug("WATCHDOD: SEND direct:" + smstrans.smsdict)
+                    smsgwglobals.wislogger.debug("WATCHDOD: SEND direct:" + str(smstrans.smsdict))
                 else:
                     smstrans.smsdict["status"] = 5
-                    smsgwglobals.wislogger.debug("WATCHDOD: SEND deligated:" + smstrans.smsdict)
-                smsgwglobals.wislogger.debug("WATCHDOD: SEND Update DB SUCCESS:" + smstrans.smsdict)
+                    smsgwglobals.wislogger.debug("WATCHDOD: SEND deligated:" + str(smstrans.smsdict))
+                smsgwglobals.wislogger.debug("WATCHDOD: SEND Update DB SUCCESS:" + str(smstrans.smsdict))
                 smstrans.updatedb()
             else:
                 if smstrans.smsdict["status"] == 0:
                     smstrans.smsdict["status"] = 104
-                    smsgwglobals.wislogger.debug("WATCHDOD: SEND direct ERROR:" + smstrans.smsdict)
+                    smsgwglobals.wislogger.debug("WATCHDOD: SEND direct ERROR:" + str(smstrans.smsdict))
                 else:
                     smstrans.smsdict["status"] = 105
-                    smsgwglobals.wislogger.debug("WATCHDOD: SEND deligated ERROR:" + smstrans.smsdict)
-                smsgwglobals.wislogger.debug("WATCHDOD: SEND Update DB ERROR:" + smstrans.smsdict)
+                    smsgwglobals.wislogger.debug("WATCHDOD: SEND deligated ERROR:" + str(smstrans.smsdict))
+                smsgwglobals.wislogger.debug("WATCHDOD: SEND Update DB ERROR:" + str(smstrans.smsdict))
                 smstrans.updatedb()
 
         except urllib.error.URLError as e:
@@ -86,7 +86,7 @@ class Watchdog(threading.Thread):
                 smstrans.smsdict["status"] = 100
             else:
                 smstrans.smsdict["status"] = 105
-            smsgwglobals.wislogger.debug("WATCHDOG: SEND EXCEPTION " + smstrans.smsdict)
+            smsgwglobals.wislogger.debug("WATCHDOG: SEND EXCEPTION " + str(smstrans.smsdict))
             smstrans.updatedb()
             # set SMS to not send!!!
             smsgwglobals.wislogger.debug(e)
@@ -119,24 +119,23 @@ class Watchdog(threading.Thread):
             smstrans.smsdict["statustime"] = datetime.utcnow()
             if f.getcode() == 200:
                 smstrans.smsdict["status"] = 3
-                smsgwglobals.wislogger.debug("WATCHDOF: DELIGATE SUCCESS " + smstrans.smsdict)
-                smsgwglobals.wislogger.debug("WATCHDOD: DELIGATE update  DB SUCCESS:" + smstrans.smsdict)
+                smsgwglobals.wislogger.debug("WATCHDOF: DELIGATE SUCCESS " + str(smstrans.smsdict))
+                smsgwglobals.wislogger.debug("WATCHDOD: DELIGATE update  DB SUCCESS:" + str(smstrans.smsdict))
                 smstrans.updatedb()
             else:
                 smstrans.smsdict["status"] = 103
-                smsgwglobals.wislogger.debug("WATCHDOF: DELIGATE ERROR " + smstrans.smsdict)
-                smsgwglobals.wislogger.debug("WATCHDOD: DELIGATE update DB ERROR: " + smstrans.smsdict)
+                smsgwglobals.wislogger.debug("WATCHDOF: DELIGATE ERROR " + str(smstrans.smsdict))
+                smsgwglobals.wislogger.debug("WATCHDOD: DELIGATE update DB ERROR: " + str(smstrans.smsdict))
                 smstrans.updatedb()
         except urllib.error.URLError as e:
             # set SMS to not send!!!
             smstrans.smsdict["status"] = 103
-            smsgwglobals.wislogger.debug(smstrans.smsdict)
             smstrans.updatedb()
             smsgwglobals.wislogger.debug(e)
-            smsgwglobals.wislogger.debug("WATCHDOG: DELIGATE Get peers NOTOK")
+            smsgwglobals.wislogger.debug("WATCHDOG: DELIGATE Get peers NOTOK " + str(smstrans.smsdict))
         except socket.timeout as e:
             smsgwglobals.wislogger.debug(e)
-            smsgwglobals.wislogger.debug("WATCHDOG: DELIGATE socket connection timeout")
+            smsgwglobals.wislogger.debug("WATCHDOG: DELIGATE socket connection timeout " + str(smstrans.smsdict))
 
     def process(self):
         smsgwglobals.wislogger.debug("WATCHDOG: processing sms")
@@ -176,7 +175,7 @@ class Watchdog(threading.Thread):
                 if routes is None or len(routes) == 0:
                     smstrans.smsdict["statustime"] = datetime.utcnow()
                     smstrans.smsdict["status"] = 100
-                    smsgwglobals.wislogger.debug("WATCHDOG: NO routes to process SMS: " + smstrans.smsdict)
+                    smsgwglobals.wislogger.debug("WATCHDOG: NO routes to process SMS: " + str(smstrans.smsdict))
                     smstrans.updatedb()
                     continue
 
