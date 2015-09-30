@@ -32,6 +32,7 @@ from application import root
 from application.smstransfer import Smstransfer
 from application.watchdog import Watchdog
 from application.router import Router
+from application.stats import Logstash
 from application import wisglobals
 from application import apperror
 from application import routingdb
@@ -478,8 +479,39 @@ class Wisserver(object):
                                 wisglobals.wisipaddress})
         cherrypy.config.update({'server.socket_port':
                                 int(wisglobals.wisport)})
+        cherrypy.tree.mount(StatsLogstash(), '/smsgateway/api/stats/logstash', {'/': {'request.dispatch': cherrypy.dispatch.MethodDispatcher()}})
         cherrypy.quickstart(Root(), '/smsgateway',
                             'wis-web.conf')
+
+
+class StatsLogstash:
+    exposed = True
+
+    def POST(self):
+        smsgwglobals.wislogger.debug("WIS: STATS API call LOGSTASH")
+        cl = cherrypy.request.headers['Content-Length']
+        rawbody = cherrypy.request.body.read(int(cl))
+        rawbody = rawbody.decode("utf-8")
+
+        if not rawbody:
+            return "error"
+
+        body = ""
+        try:
+            body = json.loads(rawbody)
+        except:
+            smsgwglobals.wislogger.debug("WIS: STATS API LOGSTASH json loads error")
+            cherrypy.response.status = 400
+            return "No valid json given"
+
+        if 'token' not in body:
+            cherrypy.response.status = 400
+            return "No token given"
+
+        reporter = Logstash()
+        reporter.report()
+
+        return '{"result" : 0}'
 
 
 def main(argv):

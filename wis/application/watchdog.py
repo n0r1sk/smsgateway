@@ -50,8 +50,6 @@ class Watchdog(threading.Thread):
         request.add_header("Content-Type",
                            "application/json;charset=utf-8")
 
-        # smstrans = smstransfer.Smstransfer(**sms)
-
         try:
             smsgwglobals.wislogger.debug("WATCHDOG: " +
                                          "Sending VIA " +
