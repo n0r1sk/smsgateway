@@ -26,8 +26,6 @@ from common import config
 from common import error
 from common import smsgwglobals
 
-# TODO: add version table for database scheme
-
 
 class Database(object):
     """Base class for Database handling - SQLite3
@@ -64,8 +62,7 @@ class Database(object):
         # create tables and indexes if not exit
         self.create_table_users()
         self.create_table_sms()
-        # TODO delete
-        # self.create_table_routing()
+        self.create_table_stats()
 
         # delete sms older than configured timetoleave dbttl
         # default is 90 days in seconds
@@ -123,6 +120,37 @@ class Database(object):
                  "ON sms (status, modemid)"
                  )
         self.__cur.execute(query)
+
+    # Create table stats
+    def create_table_stats(self):
+        smsgwglobals.dblogger.info("SQLite: Create table 'stats'")
+        query = ("CREATE TABLE IF NOT EXISTS stats (" +
+                 "type TEXT PRIMARY KEY UNIQUE, " +
+                 "lasttimestamp TIMESTAMP)")
+        self.__cur.execute(query)
+
+    # Insert or replaces a stats timestamp data
+    def write_statstimestamp(self, timestamp, intype='SUC_SMS_STATS'):
+        """Insert or replace a stats entry timestamp
+        """
+        query = ("INSERT OR REPLACE INTO stats " +
+                 "(type, lasttimestamp) " +
+                 "VALUES (?, ?) ")
+        # set changed timestamp to utcnow if not set
+
+        try:
+            smsgwglobals.dblogger.debug("SQLite: Write into stats" +
+                                        " :intype: " + str(intype) +
+                                        " :lasttimestamp: " + str(timestamp)
+                                        )
+            self.__cur.execute(query, (intype, timestamp))
+            self.__con.commit()
+            smsgwglobals.dblogger.debug("SQLite: Insert done!")
+
+        except Exception as e:
+            smsgwglobals.dblogger.critical("SQLite: " + query +
+                                           " failed! [EXCEPTION]:%s", e)
+            raise error.DatabaseError("Unable to INSERT stats! ", e)
 
     # Insert or replaces a users data
     def write_users(self, user, password, salt, changed=None):
@@ -362,6 +390,29 @@ class Database(object):
                                            " failed! [EXCEPTION]:%s", e)
             raise error.DatabaseError("Unable to DELETE sms! ", e)
 
+    # Read stats timestamp
+    def read_statstimestamp(self, intype='SUC_SMS_STATS'):
+        smsgwglobals.dblogger.debug("SQLite: Read stats " +
+                                    " :type: " + str(intype)
+                                    )
+        query = ("SELECT " +
+                 "type, " +
+                 "lasttimestamp " +
+                 "FROM stats " +
+                 "WHERE type = ?")
+        try:
+            result = self.__cur.execute(query, [intype])
+        except Exception as e:
+            smsgwglobals.dblogger.critical("SQLite: " + query +
+                                           " failed! [EXCEPTION]:%s", e)
+            raise error.DatabaseError("Unable to SELECT FROM stats! ", e)
+        else:
+            # convert rows to dict
+            stats = [dict(row) for row in result]
+            smsgwglobals.dblogger.debug("SQLite: " + str(len(stats)) +
+                                        " user selected.")
+            return stats
+
     # Read users
     def read_users(self, user=None):
         smsgwglobals.dblogger.debug("SQLite: Read users" +
@@ -473,6 +524,48 @@ class Database(object):
             sms = [dict(row) for row in result]
             smsgwglobals.dblogger.debug("SQLite: " + str(len(sms)) +
                                         " SMS selected.")
+            return sms
+
+    # Read successfuly sent sms for stats
+    def read_sucsmsstats(self, timestamp=None):
+
+        smsgwglobals.dblogger.debug("SQLite: Read SMS stats" +
+                                    " with :timestamp: gt " + str(timestamp)
+                                    )
+        query = ("SELECT " +
+                 "smsid, " +
+                 "modemid, " +
+                 "targetnr, " +
+                 "content, " +
+                 "priority, " +
+                 "appid, " +
+                 "sourceip, " +
+                 "xforwardedfor, " +
+                 "smsintime, " +
+                 "status, " +
+                 "statustime " +
+                 "FROM sms " +
+                 "WHERE (status = 4 OR status = 5)"
+                 )
+        # status 4 or 5 -> successfully send sms
+
+        orderby = " ORDER BY statustime ASC;"
+        try:
+            if timestamp is None:
+                query = query + orderby
+                result = self.__cur.execute(query)
+            else:
+                # greater than timestamp
+                query = query + "AND statustime > ?" + orderby
+                result = self.__cur.execute(query, [timestamp])
+        except Exception as e:
+            smsgwglobals.dblogger.critical("SQLite: " + query +
+                                           " failed! [EXCEPTION]:%s", e)
+            raise error.DatabaseError("Unable to SELECT stats FROM sms! ", e)
+        else:
+            sms = [dict(row) for row in result]
+            smsgwglobals.dblogger.debug("SQLite: " + str(len(sms)) +
+                                        " SMS for stats selected.")
             return sms
 
 
