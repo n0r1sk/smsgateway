@@ -422,6 +422,10 @@ class Wisserver(object):
         db = Database()
 
         abspath = path.abspath(path.join(path.dirname(__file__), path.pardir))
+
+        # store the abspath in globals for easier handling
+        wisglobals.smsgatewayabspath = abspath
+
         configfile = abspath + '/conf/smsgw.conf'
         cfg = SmsConfig(configfile)
 
@@ -504,14 +508,18 @@ class StatsLogstash:
             cherrypy.response.status = 400
             return "No valid json given"
 
+        count = 0;
+
         if 'token' not in body:
             cherrypy.response.status = 400
             return "No token given"
+        try:
+            reporter = Logstash(body['token'])
+            retval = reporter.report()
+        except RuntimeError as e:
+            smsgwglobals.wislogger.debug("WIS: STATS exception " + str(e))
 
-        reporter = Logstash()
-        reporter.report()
-
-        return '{"result" : 0}'
+        return '{"all" : ' + str(retval['all']) + ', "pro" : ' + str(retval['pro']) + '}'
 
 
 def main(argv):

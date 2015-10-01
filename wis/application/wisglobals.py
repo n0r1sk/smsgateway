@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+smsgatewayabspath = None
+
 watchdogThread = None
 watchdogThreadNotify = None
 routerThread = None
