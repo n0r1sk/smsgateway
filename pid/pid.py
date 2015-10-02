@@ -24,7 +24,6 @@ import json
 sys.path.insert(0, "..")
 
 import pidglobals
-# from common import error
 from common import smsgwglobals
 from common.config import SmsConfig
 from common.helper import GlobalHelper
