@@ -126,10 +126,13 @@ class USBModem(object):
         # Encode message
         encoded = gammu.EncodeSMS(smsinfo)
 
+        # Replace + with country exit code of Modem
+        tonr = self.transform_targetnr(targetnr)
+
         # Send message
         for message in encoded:
             message['SMSC'] = {'Location': 1}
-            message['Number'] = targetnr
+            message['Number'] = tonr
 
             try:
                 msgref = self.__statemachine.SendSMS(message)

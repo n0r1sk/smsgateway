@@ -29,7 +29,6 @@ from common import smsgwglobals
 from common.config import SmsConfig
 from common.helper import GlobalHelper
 from common.filelogger import FileLogger
-from helper.gammumodem import USBModem
 from helper.heartbeat import Heartbeat
 
 
@@ -222,10 +221,39 @@ class Pid(object):
         configfile = abspath + '/conf/smsgw.conf'
         gammucfg = abspath + '/conf/gammu.conf'
         print(configfile)
+        print(gammucfg)
         cfg = SmsConfig(configfile)
 
         pidglobals.pidid = cfg.getvalue('pidid', 'pid-dummy', 'pid')
         smsgwglobals.pidlogger.debug("PisID: " + pidglobals.pidid)
+
+        # Wrapping Gammu or not
+        wrapgammu = cfg.getvalue('wrapgammu', 'Off', 'pid')
+        if wrapgammu == "On":
+            pidglobals.wrapgammu = True
+
+            gammucmd = cfg.getvalue('gammucmd', 'gammu', 'pid')
+            smsgwglobals.pidlogger.debug("Gammucmd: " + str(gammucmd))
+
+            if path.isfile(gammucmd) or path.islink(gammucmd):
+                # file or link exists all fine
+                pidglobals.gammucmd = gammucmd
+                # Import class wrapping code of gammu cli
+                from helper.wrapped import USBModem
+            else:
+                # exit PID here as not Modem connection will work!
+                option = "command given at gammucmd not found!"
+                errortext = "ERROR in conf/smsgw.cfg at option: " + str(option) + "\n"
+                sys.stderr.__write(errortext)
+                # System errorcode 1 ... is defined as config error
+                sys.exit(1)
+
+        else:
+            pidglobals.wrapgammu = False
+            # Import class using python-gammu
+            from helper.gammumodem import USBModem
+        smsgwglobals.pidlogger.debug("WrapGammu: " +
+                                     str(pidglobals.wrapgammu))
 
         testmode = cfg.getvalue('testmode', 'Off', 'pid')
         if testmode == "On":

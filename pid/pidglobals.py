@@ -22,3 +22,5 @@ testmode = None
 heartbeatdaemon = None
 curpisurl = None
 primpisurl = None
+wrapgammu = None
+gammucmd = None
