@@ -21,7 +21,7 @@ from common import smsgwglobals
 import pidglobals
 
 
-class USBModem(object):
+class WrappedUSBModem(object):
     __status = None
     __config = None
     __section = None
@@ -29,13 +29,19 @@ class USBModem(object):
     __basecommand = None
     __command_env = None
 
-    def __init__(self, config, section=0, pin=None, ctryexitcode="00"):
+    def __init__(self, command, config, section=0, pin=None, ctryexitcode="00"):
         self.__config = config
         self.__section = section
         self.__ctryexitcode = ctryexitcode
-        self.__basecommand = [pidglobals.gammucmd,
+        self.__basecommand = [command,
                               "-c", self.__config,
                               "-s", str(self.__section)]
+        if pidglobals.gammudebug:
+            self.__basecommand.append("-d")
+            self.__basecommand.append("textalldate")
+            self.__basecommand.append("-f")
+            self.__basecommand.append(pidglobals.gammudebugfile)
+
         # copy os environment and set lang to en to be sure on returned output
         self.__command_env = os.environ.copy()
         self.__command_env['LANG'] = 'en_US.UTF-8'
@@ -115,9 +121,7 @@ class USBModem(object):
 
         smsgwglobals.pidlogger.debug("MODEM: send_SMS to " + tonr + " " +
                                      output)
-        if ('Error' in output or
-            'Failed' in output or
-            'error' in output):
+        if 'Error' in output or 'Failed' in output or 'error' in output:
             smsgwglobals.pidlogger.error("MODEM: Unable to send sms to " +
                                          tonr + " !")
             retval = False

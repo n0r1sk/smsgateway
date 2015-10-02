@@ -16,6 +16,7 @@
 import time
 import gammu
 from common import smsgwglobals
+import pidglobals
 
 
 class USBModem(object):
@@ -29,6 +30,11 @@ class USBModem(object):
         self.__config = config
         self.__section = section
         self.__ctryexitcode = ctryexitcode
+
+        # Enable Debuging if configured
+        if pidglobals.gammudebug:
+            gammu.SetDebugFile(pidglobals.gammudebugfile)
+            gammu.SetDebugLevel("textalldate")
 
         # Get Connection to Modem
         self.__statemachine = gammu.StateMachine()

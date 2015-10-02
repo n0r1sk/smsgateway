@@ -24,3 +24,5 @@ curpisurl = None
 primpisurl = None
 wrapgammu = None
 gammucmd = None
+gammudebug = None
+gammudebugfile = None
