@@ -56,7 +56,7 @@ class Watchdog(threading.Thread):
                                          smstrans.smsdict["modemid"] +
                                          route[0]["pisurl"] +
                                          "/sendsms")
-            f = urllib.request.urlopen(request, data, timeout=20)
+            f = urllib.request.urlopen(request, data, timeout=wisglobals.pissendtimeout)
             smsgwglobals.wislogger.debug("WATCHDOG: SMS send to PIS returncode:" + str(f.getcode()))
             # if all is OK set the sms status to SENT
             smstrans.smsdict["statustime"] = datetime.utcnow()
@@ -90,6 +90,8 @@ class Watchdog(threading.Thread):
             smsgwglobals.wislogger.debug(e)
             smsgwglobals.wislogger.debug("WATCHDOG: SEND Get peers NOTOK")
         except socket.timeout as e:
+            smstrans.smsdict["status"] = 107
+            smstrans.updatedb()
             smsgwglobals.wislogger.debug(e)
             smsgwglobals.wislogger.debug("WATCHDOG: SEND Socket connection timeout")
 
@@ -111,7 +113,7 @@ class Watchdog(threading.Thread):
                                          "Deligate VIA " +
                                          route[0]["wisurl"] +
                                          "/smsgateway/api/deligate")
-            f = urllib.request.urlopen(request, data, timeout=20)
+            f = urllib.request.urlopen(request, data, timeout=wisglobals.pissendtimeout)
             smsgwglobals.wislogger.debug("WATCHDOG: SMS deligate to PIS returncode:" + str(f.getcode()))
             # if all is OK set the sms status to SENT
             smstrans.smsdict["statustime"] = datetime.utcnow()

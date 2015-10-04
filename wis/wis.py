@@ -459,6 +459,9 @@ class Wisserver(object):
         # write the default user on startup
         db.write_users('root', password, salt)
 
+        # read pissendtimeout
+        wisglobals.pissendtimeout = int(cfg.getvalue('pissendtimeout', '20', 'wis'))
+
         # check if ssl is enabled
         wisglobals.sslenabled = cfg.getvalue('sslenabled', None, 'wis')
         wisglobals.sslcertificate = cfg.getvalue('sslcertificate', None, 'wis')
@@ -507,8 +510,6 @@ class StatsLogstash:
             smsgwglobals.wislogger.debug("WIS: STATS API LOGSTASH json loads error")
             cherrypy.response.status = 400
             return "No valid json given"
-
-        count = 0;
 
         if 'token' not in body:
             cherrypy.response.status = 400

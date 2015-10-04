@@ -25,6 +25,8 @@ wisid = None
 wisport = None
 wisipaddress = None
 
+pissendtimeout = None
+
 ldapenabled = None
 ldapserver = None
 ldapbasedn = None
