@@ -119,8 +119,9 @@ class USBModem(object):
         else:
             whichID = 'ConcatenatedTextLong'
 
+        # Fixes issue #43 - changing to not setting a SMS Class
         smsinfo = {
-            'Class': 1,
+            'Class': -1,
             'Unicode': isUnicode,
             'Entries': [
                 {
