@@ -31,11 +31,6 @@ class USBModem(object):
         self.__section = section
         self.__ctryexitcode = ctryexitcode
 
-        # Enable Debuging if configured
-        if pidglobals.gammudebug:
-            gammu.SetDebugFile(pidglobals.gammudebugfile)
-            gammu.SetDebugLevel("textalldate")
-
         # Get Connection to Modem
         self.__statemachine = gammu.StateMachine()
 
@@ -50,6 +45,11 @@ class USBModem(object):
 
             # Connect to USBModem
             self.__statemachine.Init()
+
+            # Enable debugging if configured
+            if pidglobals.gammudebug:
+                self.__statemachine.SetDebugFile(pidglobals.gammudebugfile)
+                self.__statemachine.SetDebugLevel("textalldate")
 
             # Set_Pin
             status = self.set_pin(pin)
