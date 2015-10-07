@@ -504,6 +504,9 @@ class StatsLogstash:
             return "error"
 
         body = ""
+        retval = {}
+        retval['all'] = "error"
+        retval['pro'] = "error"
         try:
             body = json.loads(rawbody)
         except:

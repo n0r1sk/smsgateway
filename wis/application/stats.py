@@ -17,8 +17,8 @@ from application import wisglobals
 from common.config import SmsConfig
 from common import smsgwglobals
 from common import database
+import requests
 import json
-import urllib
 import re
 
 
@@ -80,12 +80,12 @@ class Logstash():
 
             try:
                 self.send(datafieldsrow=datafieldsrow, timestamp=datafieldsrow['statustime'])
+                db.write_statstimestamp(sms['statustime'])
+                retval['pro'] += 1
             except RuntimeError as e:
                 smsgwglobals.wislogger.debug("STATS: Logstash reporter send exeption " + str(e))
+                raise
                 break
-
-            db.write_statstimestamp(sms['statustime'])
-            retval['pro'] += 1
 
         return retval
 
@@ -100,14 +100,13 @@ class Logstash():
 
         smsgwglobals.wislogger.debug("STATS: Logstash reporter send data " + str(DATA))
 
-        req = urllib.request.Request(url=self.logstashstatsserver, data=DATA, method='PUT')
-        req.add_header('content-type', 'application/json')
-
         try:
-            f = urllib.request.urlopen(req)
-            smsgwglobals.wislogger.debug("STATS: Logstash reporter send status %s, %s ", str(f.status), str(f.reason) )
-        except:
-            raise RuntimeError('STATS: Problem in submitting data to logstash')
+            headers = {'content-type': 'application/json'}
+            r = requests.put(self.logstashstatsserver, data=DATA, headers=headers)
+            smsgwglobals.wislogger.debug("STATS: Logstash reporter send status code %s ", str(r.status_code))
 
-        if f.status != 200:
+        except Exception as e:
+            raise RuntimeError('STATS: Problem in submitting data to logstash' + str(e))
+
+        if r.status_code != 200:
             raise RuntimeError('STATS: Logstash send wrong wrong HTML status code')
