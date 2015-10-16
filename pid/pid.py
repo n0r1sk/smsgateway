@@ -226,6 +226,13 @@ class Modem(object):
 
 
 class Pid(object):
+    def exit_pid(self, errorcode, errortext):
+        errortext = errortext + '\n'
+        sys.stderr.write(errortext)
+        # System errorcode 1 ... is defined as config error
+        # System errorcode 2 ... is defined as modem error
+        sys.exit(errorcode)
+
     def run(self):
         # load the configuration
         abspath = path.abspath(path.join(path.dirname(__file__), path.pardir))
@@ -255,21 +262,24 @@ class Pid(object):
         if wrapgammu == "On":
             pidglobals.wrapgammu = True
 
-            gammucmd = cfg.getvalue('gammucmd', 'gammu', 'pid')
+            gammucmd = cfg.getvalue('gammucmd', 'Blank', 'pid')
             smsgwglobals.pidlogger.debug("Gammucmd: " + str(gammucmd))
+
+            if gammucmd == "Blank":
+                option = "gammucmd - is not set!"
+                errortext = "ERROR in conf/smsgw.cfg at option: "
+                errortext = errortext + option
+                self.exit_pid(1, errortext)
 
             if path.isfile(gammucmd) or path.islink(gammucmd):
                 # file or link exists all fine
                 pidglobals.gammucmd = gammucmd
-
             else:
                 # exit PID here as not Modem connection will work!
-                option = "command given at gammucmd not found!"
+                option = "gammucmd - Command given not found!"
                 errortext = "ERROR in conf/smsgw.cfg at option: "
-                errortext = errortext + str(option) + "\n"
-                sys.stderr.__write(errortext)
-                # System errorcode 1 ... is defined as config error
-                sys.exit(1)
+                errortext = errortext + str(option)
+                self.exit_pid(1, errortext)
         else:
             pidglobals.wrapgammu = False
 
@@ -309,6 +319,9 @@ class Pid(object):
         smsgwglobals.pidlogger.debug(pidglobals.pidid + ": " +
                                      "ModemList: " +
                                      str(pidglobals.modemlist))
+        if len(pidglobals.modemlist) == 0:
+            errortext = "Unable to connect or init any configured modem."
+            self.exit_pid(2, errortext)
 
         pisurlcfg = cfg.getvalue('pisurllist',
                                  '[{"url": "ws://127.0.0.1:7788"}]',
