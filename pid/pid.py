@@ -308,10 +308,19 @@ class Pid(object):
 
         # convert json to list of dictionary entries
         modemlist = json.loads(modemcfg)
+
         # check if modemcfg is set
         if 'modemid' not in modemlist[0]:
             # if len(modemlist) == 0:
             cfg.errorandexit("modemlist - not set!!!")
+        else:
+            # validate modem settings
+            for modem in modemlist:
+                try:
+                    re.compile(modem['regex'])
+                except Exception:
+                    cfg.errorandexit("modemlist - " + modem +
+                                     " invalid regex!")
 
         # connect to USBModems and persist in pidglobals
         Modem.connectmodems(modemlist, gammucfg)
