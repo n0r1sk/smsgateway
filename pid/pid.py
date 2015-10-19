@@ -21,6 +21,7 @@ import urllib.error
 from os import path
 from ws4py.client.threadedclient import WebSocketClient
 import json
+import re
 sys.path.insert(0, "..")
 
 import pidglobals
@@ -226,13 +227,6 @@ class Modem(object):
 
 
 class Pid(object):
-    def exit_pid(self, errorcode, errortext):
-        errortext = errortext + '\n'
-        sys.stderr.write(errortext)
-        # System errorcode 1 ... is defined as config error
-        # System errorcode 2 ... is defined as modem error
-        sys.exit(errorcode)
-
     def run(self):
         # load the configuration
         abspath = path.abspath(path.join(path.dirname(__file__), path.pardir))
@@ -267,9 +261,7 @@ class Pid(object):
 
             if gammucmd == "Blank":
                 option = "gammucmd - is not set!"
-                errortext = "ERROR in conf/smsgw.cfg at option: "
-                errortext = errortext + option
-                self.exit_pid(1, errortext)
+                cfg.errorandexit(option)
 
             if path.isfile(gammucmd) or path.islink(gammucmd):
                 # file or link exists all fine
@@ -277,9 +269,7 @@ class Pid(object):
             else:
                 # exit PID here as not Modem connection will work!
                 option = "gammucmd - Command given not found!"
-                errortext = "ERROR in conf/smsgw.cfg at option: "
-                errortext = errortext + str(option)
-                self.exit_pid(1, errortext)
+                cfg.errorandexit(option)
         else:
             pidglobals.wrapgammu = False
 
@@ -318,9 +308,9 @@ class Pid(object):
             for modem in modemlist:
                 try:
                     re.compile(modem['regex'])
-                except Exception:
-                    cfg.errorandexit("modemlist - " + modem +
-                                     " invalid regex!")
+                except:
+                    cfg.errorandexit("modemlist - at " + modem['modemid'] +
+                                     " - invalid regex!")
 
         # connect to USBModems and persist in pidglobals
         Modem.connectmodems(modemlist, gammucfg)
@@ -329,8 +319,8 @@ class Pid(object):
                                      "ModemList: " +
                                      str(pidglobals.modemlist))
         if len(pidglobals.modemlist) == 0:
-            errortext = "Unable to connect or init any configured modem."
-            self.exit_pid(2, errortext)
+            errortext = "at any configured modem."
+            cfg.errorandexit(errortext, 2)
 
         pisurlcfg = cfg.getvalue('pisurllist',
                                  '[{"url": "ws://127.0.0.1:7788"}]',

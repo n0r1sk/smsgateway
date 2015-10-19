@@ -75,8 +75,13 @@ class SmsConfig(object):
         else:
             return retval
 
-    def errorandexit(self, option):
-        errortext = "ERROR in conf/smsgw.cfg at option: " + str(option) + "\n"
+    def errorandexit(self, option, errorcode=1):
+        if errorcode == 1:
+            errortext = "ERROR in conf/smsgw.cfg at option: "
+        elif errorcode == 2:
+            errortext = "ERROR at init/connection to modems: "
+        errortext = errortext + str(option) + "\n"
         sys.stderr.write(errortext)
         # System errorcode 1 ... is defined as config error
-        sys.exit(1)
+        # System errorcode 2 ... is defined as modem error
+        sys.exit(errorcode)
