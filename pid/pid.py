@@ -296,8 +296,11 @@ class Pid(object):
 
         modemcfg = cfg.getvalue('modemlist', '[{}]', 'pid')
 
-        # convert json to list of dictionary entries
-        modemlist = json.loads(modemcfg)
+        try:
+            # convert json to list of dictionary entries
+            modemlist = json.loads(modemcfg)
+        except:
+            cfg.errorandexit("modemlist - not a valid JSON structure!")
 
         # check if modemcfg is set
         if 'modemid' not in modemlist[0]:
