@@ -92,6 +92,12 @@ class PidWsClient(WebSocketClient):
             # reply sms-status to PIS
             self.send(message)
 
+            # Exit PID on ERROR on sending sms
+            if "ERROR" in tosend['status']:
+                closingreason = "Modem ERROR while sending SMS!"
+                pidglobals.closingcode = 4000
+                self.close(code=4000, reason=closingreason)
+
             # calculate difference time to last primary PIS check
             diff = datetime.now() - self.lastprimcheck
 
